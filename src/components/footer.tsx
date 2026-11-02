@@ -1,0 +1,4 @@
+import Link from 'next/link';
+import {Arrow,Spark} from './icons';
+import {site} from '@/data/site';
+export function Footer(){return <footer className="footer"><div className="wrap"><div className="section-label"><span>06 / The next conversation</span><span>Made of ideas. Open to yours.</span></div><Link href="/contact" className="footer-cta"><span>Let’s make<br/><span className="muted">something.</span></span><span className="footer-arrow"><Arrow diagonal/></span></Link><div className="footer-contact"><a href={`mailto:${site.email}`}>{site.email}<Arrow diagonal/></a><span>{site.location}</span></div><div className="footer-bottom"><span>© {new Date().getFullYear()} PIXXMAP Design</span><span className="footer-signature"><Spark/> Everything & everyone.</span><a href="#top">Back to top ↑</a></div></div></footer>;}

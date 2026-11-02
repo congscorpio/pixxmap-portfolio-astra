@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {projects,categories,filterProjects,parseCategories,getProject,nextProject} from '../src/data/projects';
+test('slugs are unique, stable and URL-safe',()=>{assert.equal(new Set(projects.map(p=>p.slug)).size,projects.length);for(const p of projects)assert.match(p.slug,/^[a-z0-9]+(?:-[a-z0-9]+)*$/);});
+test('multiple filters use union semantics without duplicated projects',()=>{const result=filterProjects(projects,['Branding & Visual Identity','Campaign & Social']);assert.ok(result.some(p=>p.slug==='toshiba-socialguideline'));assert.equal(result.length,new Set(result.map(p=>p.slug)).size);assert.ok(!result.some(p=>p.slug==='manulife'));assert.equal(result.length,6);});
+test('unselected filters return all projects; no fictional POSM project is added',()=>{assert.equal(filterProjects(projects,[]).length,10);assert.deepEqual(filterProjects(projects,['POSM & Retail']),[]);});
+test('URL parsing ignores invalid categories and de-duplicates valid ones',()=>{assert.deepEqual(parseCategories('Campaign & Social,Unknown,Campaign & Social'),['Campaign & Social']);assert.deepEqual(parseCategories(null),[]);});
+test('all projects use valid nonempty category sets',()=>{for(const p of projects){assert.ok(p.categories.length);for(const c of p.categories)assert.ok(categories.includes(c));}});
+test('unknown projects remain absent and next navigation wraps',()=>{assert.equal(getProject('not-real'),undefined);assert.equal(nextProject(projects.at(-1)!.slug).slug,projects[0].slug);});
+test('ready projects require real media and confirmed editorial content',()=>{for(const p of projects){if(p.status==='ready'){assert.ok(p.cover);assert.ok(p.client);assert.ok(p.year);assert.ok(p.role);assert.ok(p.story.length);}for(const media of [p.cover,...p.gallery].filter(Boolean)){assert.ok(media!.alt.trim());assert.ok(media!.width>0&&media!.height>0);assert.ok(media!.src.startsWith('/projects/'));}}});
